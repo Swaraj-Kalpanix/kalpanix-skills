@@ -1,0 +1,14 @@
+{
+  "name": "kalpanix-skills",
+  "description": "Kalpanix's Claude Code plugins — repeatable setups and conventions for our apps",
+  "owner": {
+    "name": "Kalpanix"
+  },
+  "plugins": [
+    {
+      "name": "expo-setup",
+      "source": "./plugins/expo-setup",
+      "description": "Initial setup for a Kalpanix Expo (iOS/Android) app on the latest SDK: agent docs, feature folders, core data layer with mocks, Jest, Tamagui UI, branding, EAS"
+    }
+  ]
+}

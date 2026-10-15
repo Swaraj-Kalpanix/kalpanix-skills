@@ -1,0 +1,12 @@
+{
+  "name": "expo-setup",
+  "displayName": "Expo App Setup",
+  "version": "1.0.0",
+  "description": "Initial setup for a Kalpanix Expo (iOS/Android) app on the latest SDK, in six phases: foundation, core data layer, testing, UI, branding, EAS",
+  "author": {
+    "name": "Kalpanix"
+  },
+  "repository": "https://github.com/Swaraj-Kalpanix/kalpanix-skills",
+  "license": "MIT",
+  "keywords": ["expo", "react-native", "tamagui", "react-query", "eas", "setup"]
+}
