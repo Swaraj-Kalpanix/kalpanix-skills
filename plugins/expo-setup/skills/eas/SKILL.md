@@ -56,7 +56,7 @@ Cloud builds use the account's quota — **ask before starting one**.
 - `npm run build:dev:android` → when finished, install on a running emulator/device with `npx eas-cli@latest build:run -p android --latest` (installs the existing build; it does not rebuild). Then `npx expo start --dev-client`.
 - Downloading the APK in the emulator's browser often fails with "problem parsing the package" — use `build:run` or `adb install <apk>` instead.
 - `INSTALL_FAILED_INSUFFICIENT_STORAGE` / "not enough space" → the emulator's internal storage is full: Device Manager → Edit AVD → Advanced → Internal Storage 8 GB → Wipe Data → Cold Boot (or `adb uninstall <BUNDLE_ID>` first); check with `adb shell df -h /data`.
-- On the device, check: splash + icon, fonts (Inter/Sora), a toast, the confirm dialog, a bottom sheet with a text input and the keyboard.
+- On the device, open the **Design system** screen (from the home placeholder) and check it in light and dark: fonts (Geist), the brand colour on the primary button, a toast, the confirm dialog (blurred backdrop), a bottom sheet, the date picker, a text field with the keyboard.
 
 ## 8. Docs
 - `CHANGELOG.md` → Added: `EAS: eas.json with development, development-simulator, preview, production profiles (channels + EXPO_PUBLIC_API_MODE per profile); runtimeVersion policy fingerprint; expo-updates + expo-dev-client.` and `npm scripts: build:dev[:android|:ios|:ios-simulator], build:preview[:android|:ios], build:prod[:android|:ios], update:preview.` Changed: `EAS project linked: owner <owner>, slug <slug>, updates.url set.`

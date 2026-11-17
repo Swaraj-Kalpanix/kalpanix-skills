@@ -15,7 +15,7 @@ updated: {{DATE}}
 ## Decision
 - **Tamagui v2 with `@tamagui/config/v5`** (tokens, light/dark + color sub-themes, media queries, shorthand-only styles) and the **Reanimated** animation driver (`@tamagui/config/v5-reanimated`, prop `transition`).
 - **Tamagui compiler (`@tamagui/babel-plugin`) installed but not enabled.** It is optional on native, the docs recommend starting without it, and it is reported to crash alongside the React Compiler (which we use). Revisit only with a measured performance need.
-- **Fonts:** Inter (body) + Sora (headings) from `@expo-google-fonts`, built with v5's `createSystemFont` (keeps the full size scale), loaded with `useFonts` behind the splash screen.
+- **Fonts:** Geist (body, headings at 600) + Geist Mono (identifiers) from `@expo-google-fonts`, built with v5's `createSystemFont` on a product size scale, loaded with `useFonts` behind the splash screen. The visual system built on this stack is MEMO-006.
 - **Feedback:** the core's `notify` → Tamagui in-app toast; the core's confirm → Tamagui `AlertDialog`. No native `burnt` toasts (one less native module).
 - **Bottom sheets:** `@gorhom/bottom-sheet` v5 (`BottomSheetModal`) for all sheets; `BottomSheetTextInput` for inputs inside sheets.
 - **Keyboard:** `react-native-keyboard-controller` (recommended by Expo's keyboard guide; handles Android edge-to-edge).
@@ -30,4 +30,4 @@ updated: {{DATE}}
 ## Consequences
 - The app needs a development build (keyboard-controller is not in Expo Go).
 - Known @gorhom/bottom-sheet issues on the New Architecture must be checked on a device.
-- Agents follow `.claude/skills/tamagui` and `.claude/skills/mobile-ui`.
+- Agents follow `.claude/skills/design-system`, `.claude/skills/tamagui` and `.claude/skills/mobile-ui`.

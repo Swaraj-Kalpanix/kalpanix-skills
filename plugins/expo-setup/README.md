@@ -17,7 +17,7 @@ It asks for the app name, bundle ID, description, API style and auth, then runs 
 | `/expo-setup:foundation` | Remove the starter template · app identity · `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md` · `docs/` (plans, memos, modules, TODO) · project skills `plan-feature`, `new-module`, `wrap-up` · feature folder + naming rules · ESLint |
 | `/expo-setup:core` | `src/lib/core` — axios clients, auth adapter (custom login or Clerk), `BaseService` / `CrudService` + zod, NestJS crud + REST query builders, React Query hooks (confirm on mutation, global toasts), mock server (wired only) · `env.ts`, `setupCore.ts` |
 | `/expo-setup:testing` | Jest + jest-expo + React Native Testing Library · the core's test suite · coverage floor · "tests only when asked" |
-| `/expo-setup:ui` | Tamagui v2 + `@tamagui/config/v5` (Reanimated) · Inter + Sora · gorhom bottom sheet · keyboard-controller · FlashList · lucide · expo-blur · react-hook-form · toast + confirm hosts · `AppProviders` · project skills `tamagui`, `mobile-ui` |
+| `/expo-setup:ui` | Tamagui v2 + `@tamagui/config/v5` (Reanimated) · **design system**: warm neutral palette, brand theme generated + contrast-checked from one hex (`makeBrandTheme.mjs`), Geist + Geist Mono product type scale, Light/Dark/System, ~40 components in `src/components/ui`, dev-only Design system screen · gorhom bottom sheet · keyboard-controller · FlashList · `@expo/ui` date picker · lucide · expo-blur · react-hook-form · toast, confirm, action-lock hosts · `AppProviders` · project skills `design-system`, `tamagui`, `mobile-ui` |
 | `/expo-setup:branding` | One logo → app icon, Android adaptive + monochrome icons, splash |
 | `/expo-setup:eas` | **Last** — your EAS project ID · expo-updates (fingerprint runtime) · dev client · `eas.json` profiles · build/update scripts · first dev build |
 
@@ -25,15 +25,17 @@ It asks for the app name, bundle ID, description, API style and auth, then runs 
 
 ```
 AGENTS.md · CLAUDE.md · CHANGELOG.md · README.md · eas.json · .env.example
-.claude/  expo-setup.json (the inputs) · settings.json · skills/{plan-feature,new-module,wrap-up,tamagui,mobile-ui}
-docs/     TODO.md · plans/ (PLAN-001…004) · memos/ (MEMO-001…005) · modules/
-src/app/          _layout.tsx (fonts + splash + providers) · index.tsx
+.claude/  expo-setup.json (the inputs) · settings.json · skills/{plan-feature,new-module,wrap-up,design-system,tamagui,mobile-ui}
+docs/     TODO.md · plans/ (PLAN-001…004) · memos/ (MEMO-001…006) · modules/
+src/app/          _layout.tsx (appearance + fonts + splash + providers + error boundary) · index.tsx · design-system.tsx (dev only)
 src/lib/core/     the generic data layer (+ mock/, test/, __tests__/)
 src/lib/          env.ts · setupCore.ts
 src/providers/    AppProviders.tsx
-src/theme/        tamagui.config.ts · fonts.ts
-src/components/   feedback/AppToast.tsx · feedback/ConfirmDialogHost.tsx
-src/hooks/        useAppFonts.ts
+src/theme/        tamagui.config.ts · palette.ts · brand.ts (generated) · fonts.ts · appearance.store.ts
+src/components/   ui/ (the design system) · feedback/ (toast, confirm, action lock, error boundary) · navigation/
+src/features/     designSystem/ (the dev-only gallery)
+src/utils/        format.ts (date helpers)
+src/hooks/        useAppFonts.ts · useColorSchemeName.ts · useIsOnline.ts
 assets/images/    logo, icon, android-icon-{foreground,background,monochrome}, splash-icon
 ```
 

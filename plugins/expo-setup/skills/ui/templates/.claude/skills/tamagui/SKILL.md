@@ -7,7 +7,9 @@ description: How to build UI with Tamagui v2 (@tamagui/config/v5) in {{APP_NAME}
 
 Versions: `tamagui` v2 (check `package.json`), `@tamagui/config` (**v5 preset**), Reanimated 4 driver. Your training data is likely Tamagui v1 — **don't trust it**. When unsure, check the installed source in `node_modules/@tamagui/*/src` or the docs (full text: https://tamagui.dev/llms.txt).
 
-Config: `src/theme/tamagui.config.ts` · fonts: `src/theme/fonts.ts` · providers: `src/providers/AppProviders.tsx`.
+Config: `src/theme/tamagui.config.ts` · neutral palette: `src/theme/palette.ts` · brand: `src/theme/brand.ts` (generated) · fonts: `src/theme/fonts.ts` · providers: `src/providers/AppProviders.tsx`.
+
+**Which token a screen uses for what** (page vs card vs border, text roles, tones, button variants) is the **`design-system`** skill. Read it before building a screen; this skill is the Tamagui mechanics.
 
 ## 1. Styles are shorthand-only (`onlyAllowShorthands: true`)
 
@@ -44,15 +46,18 @@ v5 uses `styleCompat: 'web'` — flex behaves like CSS (`flex={1}` is `flex: 1 1
 
 ## 3. Themes
 
-- Light/dark follows the system: `TamaguiProvider defaultTheme` is set from `useColorScheme()` in `AppProviders`.
-- Sub-themes: `theme="accent" | "blue" | "green" | "red" | "yellow" | "orange" | "pink" | "purple" | "teal" | "gray" | "neutral" | "black" | "white" | "surface1" | "surface2"` on any component, or `<Theme name="red">…</Theme>`.
-  - Destructive action → `theme="red"`; success → `"green"`; primary → `"accent"`.
-- Read values in JS: `const theme = useTheme(); theme.color10.val` (e.g. for icon colors, native props). `useThemeName()` returns the current name.
-- Brand colors: extend with `createV5Theme({ childrenThemes: { ...defaultChildrenThemes, brand: { light, dark } } })` from `@tamagui/config/v5` (palettes from `@tamagui/colors`), then pass `themes` to `createTamagui`. Discuss with the user before adding a theme.
+- **Base palettes are the app's warm neutrals** (`palette.ts`), passed to `createV5Theme` — not v5's pure greys. ⚠ v5 maps `$background` to step **2** and `$borderColor` to step **4**; the array order is load-bearing.
+- **Light / Dark / System** is the user's choice (`src/theme/appearance.store.ts`); `TamaguiProvider defaultTheme` comes from `useColorSchemeName()`. Use that hook (not React Native's `useColorScheme`) anywhere you pick by scheme.
+- **`brand`** is a child theme generated from one hex (`brand.ts` — regenerate with the kit's `makeBrandTheme.mjs`, never hand-edit). Built-in colour themes stay available: `theme="red" | "green" | "orange" | "blue" | "purple" | "yellow" | "pink" | "teal" | "gray"`, or `<Theme name="red">…</Theme>`.
+  - Primary action → the app's `Button variant="primary"` (not `theme="brand"` by hand). Destructive → `variant="destructive"` (outlined red). Status colours → `StatusPill`'s tones.
+- **v5's Button / Input / TextArea component themes are removed** in the config: they re-tint the palette inside the component, so a white field rendered grey on a white card.
+- **Read values in JS** with `const theme = useTheme(); theme.color10?.val` — for icon colours and native props (navigator options, SVG). An SVG rejects a token string like `"$color12"`.
+- ⚠ **`useTheme()` reads the theme it is called inside.** A component that wraps itself in `<Theme name=…>` must read colours in an **inner** component (see `IconButton`, `StatusPill`, `EmptyState`).
+- Filled brand controls read `useBrandSolid()` — never `bg="$color9"` with `$color1` text (that is a near-black label on a bright fill in dark mode).
 
 ## 4. Fonts
 
-`body` = Inter (400/500/600/700), `heading` = Sora (600/700/800), loaded in the root layout while the splash stays up. `defaultFont` is `body`. Headings (`H1`–`H6`) use `heading` automatically. To use a weight: `fontWeight="600"` (mapped to the loaded face). Don't reference font files or family strings in components.
+`body` = **Geist** (400/500/600/700), `heading` = Geist **600**, `mono` = **Geist Mono** (identifiers), loaded in the root layout while the splash stays up. The size scale is a **product** scale (body 15, secondary 13, caption 12, row title 16, screen title 28) — see `fonts.ts`. In components use the text roles from `@/components/ui` (`Title`, `Heading`, `Subtitle`, `Body`, `Muted`, `Caption`, `Overline`, `Mono`, `ErrorText`) rather than `Paragraph size=…`. Don't reference font files in components (navigator header options are the one exception: they take a family string).
 
 ## 5. Media queries (responsive / tablets)
 
@@ -74,7 +79,7 @@ Pseudo states: `pressStyle`, `hoverStyle`, `focusStyle`, `focusVisibleStyle`, `d
 ## 7. Building components
 
 - Import everything from `'tamagui'` (`YStack`, `XStack`, `ZStack`, `View`, `Text`, `SizableText`, `Paragraph`, `H1`–`H6`, `Button`, `Input`, `TextArea`, `Label`, `Checkbox`, `Switch`, `RadioGroup`, `Select`, `Separator`, `Spinner`, `Avatar`, `Card`, `ScrollView`, `AlertDialog`, `Dialog`, `Popover`, `Sheet`, `Theme`, `useTheme`, `useMedia`, `styled`). Toasts from `'@tamagui/toast'`.
-- Reusable styled primitives go in `src/components/ui/` (PascalCase files), feature-only ones in the feature's `components/`.
+- **Use the design system first** (`@/components/ui`: `Screen`, `Card`, `ListRow`, `Button`, `TextField`, `Sheet`, …). Reusable new primitives go in `src/components/ui/` (PascalCase files) and get exported from its `index.ts`; feature-only ones in the feature's `components/`.
 - `styled()` with variants — prefer this over conditional style props:
 ```tsx
 export const StatusBadge = styled(XStack, {
@@ -105,6 +110,7 @@ Use **@gorhom/bottom-sheet** for bottom sheets (see the `mobile-ui` skill). Tama
 
 - No `StyleSheet.create` / inline style objects for design values in screens — use Tamagui props (StyleSheet is fine for non-visual layout glue in providers).
 - No hex colors, raw font sizes, raw spacing numbers where a token exists.
+- Don't tween colours: animate only `transform` (`animateOnly={['transform']}`) on pressables — a tweened fill flashes through `transparent` and makes presses feel late.
 - No `animation=` prop (v1) — use `transition=`.
 - No web-only props or `.web.tsx` files — this app is iOS/Android only.
 - Don't enable `@tamagui/babel-plugin` (compiler) — installed but intentionally off (MEMO-005).

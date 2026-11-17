@@ -11,7 +11,7 @@ Script: `${CLAUDE_PLUGIN_ROOT}/skills/branding/scripts/makeIcons.py` (Python 3 +
 Ask for the logo file (PNG, ideally transparent, ≥1024 px wide). Look at it (Read the image):
 - **Square symbol only** → no crop needed.
 - **Symbol + wordmark** (e.g. a mark on the left, the name on the right) → icons should use only the symbol. Find its crop box: open the image with Pillow and look at the alpha/colour columns to locate the gap between symbol and text, then confirm the box with the user.
-- Note the brand colours (sample them with Pillow) for the Tamagui brand theme TODO.
+- Note the brand colours (sample them with Pillow). If `.claude/expo-setup.json` has no `BRAND_COLOR` (or the user chose "take it from the logo"), confirm the main colour with the user, save it as `BRAND_COLOR` and regenerate the theme: `node "${CLAUDE_PLUGIN_ROOT}/skills/ui/scripts/makeBrandTheme.mjs" --color "<hex>"` (check its contrast report says `ok`).
 - Ask for the icon background colour if the logo isn't meant for white (default `#FFFFFF`).
 
 ## 2. Generate
@@ -31,4 +31,4 @@ Look at every output image before moving on (Read them). The mark must not touch
 ## 4. Verify and record
 - `npx expo-doctor`; `npx expo config --type public` shows the new paths.
 - Icons and splash only change in a **new native build** (phase 6) — say so.
-- `CHANGELOG.md` → Changed: `Branding: app icon, Android adaptive + monochrome icons and splash generated from the logo (assets/images/logo.png).` `docs/TODO.md` → Next: `Add the brand colours (<hex>, <hex>) as a Tamagui brand theme — PLAN-004`; Done: `App icon, Android adaptive/monochrome icons, and splash from the logo — PLAN-001`.
+- `CHANGELOG.md` → Changed: `Branding: app icon, Android adaptive + monochrome icons and splash generated from the logo (assets/images/logo.png).` `docs/TODO.md` → Done: `App icon, Android adaptive/monochrome icons, and splash from the logo — PLAN-001`.

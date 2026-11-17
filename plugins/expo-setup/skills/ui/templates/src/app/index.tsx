@@ -1,13 +1,19 @@
-import { Stack } from 'expo-router';
-import { H2, Paragraph, YStack } from 'tamagui';
+import { router, Stack } from 'expo-router';
+import { Palette } from 'lucide-react-native';
+
+import { Button, EmptyState, Screen } from '@/components/ui';
 
 // Placeholder home route — replace with a feature screen.
 export default function HomeScreen() {
   return (
-    <YStack flex={1} items="center" justify="center" gap="$2" bg="$background" p="$4">
+    <Screen>
       <Stack.Screen options={{ title: '{{APP_NAME}}' }} />
-      <H2>{{APP_NAME}}</H2>
-      <Paragraph color="$color10">UI foundation ready</Paragraph>
-    </YStack>
+      <EmptyState
+        icon={Palette}
+        title="{{APP_NAME}}"
+        description="UI foundation ready."
+        action={__DEV__ ? <Button variant="primary" onPress={() => router.push('/design-system')}>Open the design system</Button> : undefined}
+      />
+    </Screen>
   );
 }

@@ -12,7 +12,7 @@ This kit reproduces the **initial setup** Kalpanix uses for its Expo apps (first
 | 1 | `expo-setup:foundation` | Template removed, app identity, `AGENTS.md` / `CLAUDE.md` / `CHANGELOG.md`, `docs/`, project skills, folder + naming rules, ESLint |
 | 2 | `expo-setup:core` | `src/lib/core` (services, query builders, React Query hooks, auth adapter, toast/confirm bridges, mock server), `env.ts`, `setupCore.ts` |
 | 3 | `expo-setup:testing` | Jest + jest-expo + Testing Library, the core's test suite green, coverage floor |
-| 4 | `expo-setup:ui` | Tamagui v2 + config v5, Inter/Sora fonts, gorhom sheets, keyboard-controller, FlashList, toasts, confirm dialog, providers |
+| 4 | `expo-setup:ui` | Tamagui v2 + config v5 and the design system: warm palette, brand theme generated from one hex, Geist fonts, Light/Dark/System, ~40 components (screens, cards, rows, lists, sheets, fields), toasts, confirm dialog, a Design system screen |
 | 5 | `expo-setup:branding` | Icons, adaptive/monochrome icons and splash from one logo |
 | 6 | `expo-setup:eas` | **Last.** expo-updates, dev client, `eas.json` profiles, build/update scripts — needs the EAS project ID |
 
@@ -39,6 +39,7 @@ This kit reproduces the **initial setup** Kalpanix uses for its Expo apps (first
    - Bundle ID / Android package (`BUNDLE_ID`), e.g. `com.kalpanix.crystalcash`
    - API style (`API_STYLE`): `NestJS + @nestjsx/crud` · plain REST · not decided
    - Auth (`AUTH`): `_not decided_ — custom login or Clerk` · Clerk · custom login
+   - Brand colour (`BRAND_COLOR`, a hex such as `#2563EB`) — the primary action colour; offer "take it from the logo" (sampled in phase 5) if they don't know it
    - Logo file for phase 5 (can come later)
    - The EAS project ID is asked for **only in phase 6**.
 
@@ -55,6 +56,7 @@ This kit reproduces the **initial setup** Kalpanix uses for its Expo apps (first
      "REACT_VERSION": "<react major.minor>",
      "API_STYLE": "NestJS + @nestjsx/crud",
      "AUTH": "_not decided_ — custom login or Clerk",
+     "BRAND_COLOR": "#2563EB",
      "DATE": "<today, YYYY-MM-DD>",
      "CURRENT_STATE": "Initial setup in progress (expo-setup kit) — see docs/plans/.",
      "TEST_SUMMARY": "filled by the testing phase"
