@@ -5,7 +5,17 @@ description: {{APP_NAME}} mobile UI building blocks beyond Tamagui — bottom sh
 
 # Mobile UI building blocks
 
-All providers are already mounted in `src/providers/AppProviders.tsx` (GestureHandlerRootView → CoreQueryProvider → TamaguiProvider → ToastProvider → KeyboardProvider → BottomSheetModalProvider). Never add them again. The app runs in a **development build** (not Expo Go). Style everything with Tamagui tokens (`tamagui` skill).
+All providers are already mounted in `src/providers/AppProviders.tsx` (GestureHandlerRootView → CoreQueryProvider → TamaguiProvider → ToastProvider → KeyboardProvider → BlurTargetView → BottomSheetModalProvider, plus `ConfirmDialogHost`, `ActionLock`, `AppToast`). Never add them again. The app runs in a **development build** (not Expo Go). Style everything with Tamagui tokens (`tamagui` skill) and build screens from `@/components/ui` (`design-system` skill).
+
+**The design system already wraps every library below** — reach for the component first, the raw library only when building a new primitive:
+
+| Need | Use | Wraps |
+|---|---|---|
+| A screen (page colour, safe area, gutter, offline banner, keyboard-aware scroll, pinned footer) | `Screen` (+ `ScreenHeader`, `BottomBar`) | keyboard-controller |
+| A paged list with loading / error / empty / refresh / next page | `RecordList` | FlashList v2 |
+| A bottom sheet (title, Back closes it, keyboard-safe inputs) | `Sheet`, `FilterSheet`, `useSheetHandle` | gorhom |
+| A form field | `TextField` (`inSheet` inside a sheet), `SelectField`, `ChoiceField`, `DateField`, grouped by `FieldGroup` | RN TextInput / `BottomSheetTextInput`, `@expo/ui` DateTimePicker |
+| A confirm dialog / toast | `confirm()` / `notify` / mutation `meta` from `@/lib/core` | Tamagui AlertDialog + expo-blur / Tamagui toast |
 
 ## Lists — `@shopify/flash-list` v2
 
@@ -22,15 +32,15 @@ const { items, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetc
   onEndReachedThreshold={0.5}
   refreshing={isRefetching}
   onRefresh={refetch}
-  ListEmptyComponent={isLoading ? <LoadingState /> : <EmptyState />}
+  ListEmptyComponent={isLoading ? <ListSkeleton /> : <EmptyState title="No leads yet" />}
   ListFooterComponent={isFetchingNextPage ? <Spinner my="$4" /> : null}
 />
 ```
-Always handle loading, error, empty, pull-to-refresh, and next-page states. Keep `renderItem` rows as memo-free components (React Compiler handles it).
+`RecordList` does all of this for you — pass it the `useInfiniteList` result. Hand-roll a FlashList only for something `RecordList` can't express, and still handle loading, error, empty, pull-to-refresh, and next-page states. Keep `renderItem` rows as memo-free components (React Compiler handles it).
 
 ## Bottom sheets — `@gorhom/bottom-sheet` v5
 
-Use `BottomSheetModal` (presented on demand) for pickers, filters, quick actions, forms.
+Use the app's **`Sheet`** (`@/components/ui`) — a `BottomSheetModal` with the backdrop, theme colours, title, Android Back, scroll and keyboard handling done. A feature sheet forwards a `SheetHandle` and wires it with `useSheetHandle(ref)`. The raw API, for building a new primitive:
 ```tsx
 const sheetRef = useRef<BottomSheetModal>(null);
 const theme = useTheme();
@@ -52,7 +62,7 @@ const theme = useTheme();
 </BottomSheetModal>
 ```
 - Close with `sheetRef.current?.dismiss()`.
-- Inputs inside a sheet: **`BottomSheetTextInput`** only — do not use keyboard-controller's `KeyboardAwareScrollView` inside sheets (both libraries would react to the keyboard).
+- Inputs inside a sheet: **`TextField inSheet`** (it uses `BottomSheetTextInput`) — do not use keyboard-controller's `KeyboardAwareScrollView` inside sheets (both libraries would react to the keyboard).
 - Scrollable content: `BottomSheetScrollView`; long lists: `BottomSheetFlatList`, or FlashList via `renderScrollComponent={BottomSheetScrollView}`. `BottomSheetFlashList` is deprecated.
 - Known New-Architecture issues (first-open lag, keyboard with inputs) — test sheets on a device.
 
@@ -76,14 +86,12 @@ const createLead = leadQueries.useCreate({ meta: { successMessage: 'Lead created
   control={form.control}
   name="email"
   render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-    <YStack gap="$1">
-      <Label htmlFor="email">Email</Label>
-      <Input id="email" value={value} onChangeText={onChange} onBlur={onBlur} keyboardType="email-address" autoCapitalize="none" />
-      {error ? <Paragraph size="$2" color="$red10">{error.message}</Paragraph> : null}
-    </YStack>
+    <TextField label="Email" required value={value} onChangeText={onChange} onBlur={onBlur} error={error?.message}
+      keyboardType="email-address" autoCapitalize="none" />
   )}
 />
-<Button disabled={createLead.isPending} onPress={form.handleSubmit((values) => createLead.mutate(values))}>Save</Button>
+// Save lives in the screen's pinned footer: <Screen scroll footer={<BottomBar>…</BottomBar>}>
+<Button variant="primary" loading={createLead.isPending} onPress={form.handleSubmit((values) => createLead.mutate(values))}>Save</Button>
 ```
 `import { zodResolver } from '@hookform/resolvers/zod'`. Show server validation errors (`ApiError.messages`) via the global toast (automatic) — don't duplicate.
 
@@ -99,7 +107,7 @@ const targetRef = useRef<View>(null);
 <BlurTargetView ref={targetRef} style={{ flex: 1 }}>{content}</BlurTargetView>
 <BlurView blurTarget={targetRef} blurMethod="dimezisBlurViewSdk31Plus" intensity={60} tint="systemMaterial" style={StyleSheet.absoluteFill} />
 ```
-Use sparingly (headers, overlays) — blur is expensive on Android.
+Use sparingly (headers, overlays) — blur is expensive on Android. `AppProviders` already mounts one `BlurTargetView` around the screens (`dialogBlurTarget`, what the confirm dialog blurs) — reuse it rather than wrapping the app again.
 
 ## lodash
 

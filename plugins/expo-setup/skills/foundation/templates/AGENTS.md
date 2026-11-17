@@ -64,10 +64,11 @@ src/
 │   │                         #   the rest of core never imports it — see src/lib/core/mock/USAGE.md
 │   ├── env.ts                # validated EXPO_PUBLIC_* env
 │   └── setupCore.ts          # wires core to this app (config, mock server + feature mocks, auth adapter, notifier)
-├── theme/                    # tamagui.config.ts (tokens, themes, animations) · fonts.ts
+├── theme/                    # tamagui.config.ts · palette.ts · brand.ts (generated) · fonts.ts · appearance.store.ts
 ├── components/               # shared UI across features
-│   ├── ui/                   # design-system primitives built with Tamagui styled()
-│   └── feedback/             # AppToast, ConfirmDialogHost (wired to the core)
+│   ├── ui/                   # the design system (Screen, Card, ListRow, Sheet, fields, …) — public API index.ts
+│   ├── feedback/             # AppToast, ConfirmDialogHost, ActionLock, AppErrorBoundary (wired to the core)
+│   └── navigation/           # shared navigator options (useStackScreenOptions)
 ├── hooks/                    # shared hooks
 ├── services/                 # shared app services used by several features (e.g. uploads)
 ├── queries/                  # cross-feature query helpers
@@ -117,17 +118,23 @@ In code:
 - True constants: **UPPER_SNAKE_CASE** — `MAX_UPLOAD_MB`.
 - One component per file; its `Props` interface is `<Component>Props` in the same file.
 
-## UI — Tamagui + mobile building blocks
+## UI — the design system, on Tamagui
 
-Read the project skills before writing UI: **`.claude/skills/tamagui`** (styles, tokens, themes, animations, components) and **`.claude/skills/mobile-ui`** (bottom sheets, keyboard, FlashList, forms, icons, blur, lodash). The short version:
+Read the project skills before writing UI: **`.claude/skills/design-system`** (which surface, text role, tone and button to use; how a list, record, form and sheet screen is laid out), **`.claude/skills/tamagui`** (styles, tokens, themes, animations) and **`.claude/skills/mobile-ui`** (sheets, keyboard, FlashList, forms, icons, blur). Open the dev-only **Design system** screen (`/design-system`) to see every primitive. The short version:
 
-- **Tamagui v2 + `@tamagui/config/v5`.** Shorthand-only styles (`p`, `bg`, `items`, `rounded`, …); tokens (`$4`, `$background`, `$color11`) — never hex colors or raw spacing. Animations use the `transition` prop.
-- **Fonts:** Inter (body) and Sora (headings) via the Tamagui config — never set font families in components.
-- **Bottom sheets:** `@gorhom/bottom-sheet` (`BottomSheetModal`); inputs inside sheets use `BottomSheetTextInput`.
-- **Keyboard:** `react-native-keyboard-controller` (`KeyboardAwareScrollView`, `KeyboardStickyView`, `KeyboardToolbar`) — never React Native's `KeyboardAvoidingView`.
-- **Lists:** `@shopify/flash-list` v2 for every record list (no `estimatedItemSize`).
-- **Forms:** react-hook-form + `zodResolver` with the feature's zod schemas.
-- **Icons:** `lucide-react-native`, colored from the theme. **Blur:** `expo-blur` with `BlurTargetView` on Android.
+- **Build screens from `@/components/ui`** (`Screen`, `ScreenHeader`, `Card`, `ListRow`/`SectionCard`, `RecordList`, `Sheet`, `TextField`, `StatusPill`, `Button`, …), imported from the barrel. New shared primitives go there too, exported from `index.ts` and added to the Design system screen.
+- **Three surfaces:** page `$color1`, card/sheet/input `$background`, hairline `$borderColor`, control border `$color5`. Never a hex, raw font size or raw spacing in a component — tokens and text roles (`Title`, `Body`, `Muted`, `Caption`, `Mono`, …) only.
+- **The brand colour is rare** — the primary action, selection, focus, the create button. It is generated from one hex into `src/theme/brand.ts` (never hand-edit; rerun the kit's `makeBrandTheme.mjs`). Filled brand controls read `useBrandSolid()`. Destructive actions are outlined red.
+- **Status colour comes from six tones** (`info`, `success`, `warning`, `danger`, `neutral`, `muted`) — each feature maps its statuses onto them in one function.
+- **Every screen handles loading (skeleton), empty (says which empty + the fix), error (Try again) and offline.**
+- **Tamagui v2 + `@tamagui/config/v5`:** shorthand-only styles (`p`, `bg`, `items`, `rounded`); animations use `transition`, and only `transform` animates on pressables.
+- **Fonts:** Geist (body, headings at 600) and Geist Mono (identifiers), via the Tamagui config.
+- **Light / Dark / System** comes from `useColorSchemeName()` (never React Native's `useColorScheme`); check every screen in both schemes.
+- **Bottom sheets:** the app's `Sheet` (gorhom underneath); inputs inside use `TextField inSheet`.
+- **Keyboard:** `Screen scroll` (keyboard-controller) — never React Native's `KeyboardAvoidingView`.
+- **Lists:** `RecordList` (FlashList v2) for every record list.
+- **Forms:** react-hook-form + `zodResolver` with the feature's zod schemas, rendered with the design-system fields; Save sits in a pinned `BottomBar`.
+- **Icons:** `lucide-react-native`, coloured from the theme (resolved values, not `$tokens`). **Blur:** `expo-blur` with the `BlurTargetView` already in `AppProviders`.
 - **Toasts / confirmations:** through the core (`notify`, mutation `meta`, `confirm()`) — never mount another ToastProvider or build ad-hoc confirm dialogs.
 - All providers are mounted once in `src/providers/AppProviders.tsx` — never add them in screens.
 
@@ -143,7 +150,7 @@ Follow `src/lib/core/USAGE.md` and `src/lib/core/mock/USAGE.md`. The short versi
 - **Mutations:** destructive actions use `meta.confirm`; rely on the global toasts (`meta.successMessage` to customize) instead of calling toasts by hand.
 - **`src/lib/core/` stays app-agnostic** — no imports from features, no app-specific code; the whole folder (mock included) is copied as-is into other apps. If it needs a change, keep it generic, update its USAGE.md, and note it in the changelog.
 - **The mock is only wired to the core, never part of it:** nothing in `src/lib/core` outside `mock/` imports from `mock/`, and `@/lib/core` does not re-export it. `mock/` imports only the core's public API (`'..'`). App code imports mocks from `@/lib/core/mock`, and only inside the mock-mode block and feature `mocks/` folders — this keeps mock code out of live builds.
-- Lists on mobile use `useInfiniteList` + `FlatList`, with loading, error, empty, and pull-to-refresh states.
+- Lists on mobile use `useInfiniteList` + `RecordList` (FlashList), with loading, error, empty, and pull-to-refresh states.
 
 ## Code conventions
 

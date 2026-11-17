@@ -1,6 +1,6 @@
 ---
 id: PLAN-004
-title: UI foundation — Tamagui, sheets, keyboard, fonts, forms
+title: UI foundation — Tamagui, design system, sheets, keyboard, fonts, forms
 status: in-progress    # draft | approved | in-progress | done | dropped
 modules: []
 created: {{DATE}}
@@ -15,8 +15,8 @@ Install and wire the UI stack so feature screens can be built right away: Tamagu
 ## Decisions (MEMO-005)
 - **Tamagui v2 + `@tamagui/config/v5`**, Reanimated animation driver (`@tamagui/config/v5-reanimated`). Shorthand-only styles (`onlyAllowShorthands: true`).
 - **Compiler (`@tamagui/babel-plugin`) installed but not enabled** — optional on native, docs recommend starting without it, and it is reported to crash alongside the React Compiler.
-- **Fonts:** Inter (body) + Sora (heading) from `@expo-google-fonts/*`, built with v5's `createSystemFont` so Tamagui's full size scale is kept; loaded with `useFonts` while the splash screen stays up.
-- **Providers (outer → inner):** GestureHandlerRootView → CoreQueryProvider → TamaguiProvider (includes PortalProvider) → ToastProvider → KeyboardProvider → BottomSheetModalProvider.
+- **Fonts:** Geist + Geist Mono from `@expo-google-fonts/*`, built with v5's `createSystemFont` on a product scale (body 15); loaded with `useFonts` while the splash screen stays up.
+- **Providers (outer → inner):** GestureHandlerRootView → CoreQueryProvider → TamaguiProvider (includes PortalProvider) → ToastProvider → KeyboardProvider → BlurTargetView → BottomSheetModalProvider, plus ConfirmDialogHost, ActionLock and AppToast.
 - **Feedback:** core `setNotifier` → in-app Tamagui toast; core `useConfirmDialog` → Tamagui `AlertDialog` host.
 - **Bottom sheets:** `@gorhom/bottom-sheet` for every sheet; inputs inside sheets use `BottomSheetTextInput`.
 - **Keyboard:** `react-native-keyboard-controller` for screens/forms (needs a development build).
@@ -29,8 +29,10 @@ Install and wire the UI stack so feature screens can be built right away: Tamagu
 - [x] Toast bridge + confirm dialog host in `src/components/feedback/`
 - [x] `.claude/skills/tamagui` + `.claude/skills/mobile-ui` for agents
 - [x] Typecheck, lint, tests, Android bundle
-- [ ] First development build on a device — verify sheets, keyboard, toasts, confirm dialog, fonts
-- [ ] Brand theme from the logo colours
+- [ ] First development build on a device — verify sheets, keyboard, toasts, confirm dialog, date picker, fonts
+- [x] Visual system (MEMO-006): warm neutral palette, generated brand theme, text roles, `src/components/ui` design system, Light / Dark / System appearance, Design system screen
+- [x] `.claude/skills/design-system` for agents
+- [ ] Check the Design system screen on a device in light and dark — the brand ramp and the palette
 
 ## Risks
 - Tamagui + React Compiler without the Tamagui compiler: fine at runtime; revisit only if enabling the compiler.

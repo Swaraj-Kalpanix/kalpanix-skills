@@ -28,7 +28,7 @@ The feature list lives in [`docs/modules/README.md`](docs/modules/README.md) —
 | Backend / API | {{API_STYLE}} — the core supports NestJS crud and plain REST (MEMO-002) |
 | Data layer | `src/lib/core` — axios, mock server, `CrudService`, TanStack React Query (MEMO-002) |
 | Validation | zod — schemas are the API contract and form schemas (MEMO-002) |
-| UI | Tamagui v2 (`@tamagui/config/v5`, Reanimated driver), Inter + Sora fonts, @gorhom/bottom-sheet, react-native-keyboard-controller, FlashList v2, lucide icons, expo-blur (MEMO-005) — skills: `tamagui`, `mobile-ui` |
+| UI | Tamagui v2 (`@tamagui/config/v5`, Reanimated driver) with the Kalpanix design system in `src/components/ui` — warm neutral palette, generated brand theme, Geist + Geist Mono, Light/Dark/System; @gorhom/bottom-sheet, react-native-keyboard-controller, FlashList v2, lucide icons, expo-blur (MEMO-005, MEMO-006) — skills: `design-system`, `tamagui`, `mobile-ui` |
 | Forms | react-hook-form + @hookform/resolvers (zod) |
 | Builds / updates | EAS development builds (`eas.json`), expo-updates (runtime policy `fingerprint`) |
 | Testing | Jest + `jest-expo` + React Native Testing Library — `npm test` (MEMO-004) |
